@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TURBO Problem-Solving | Premium Executive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
+                    colors: {
+                        ntb: { accent: '#fa4786', accentGlow: 'rgba(250, 71, 134, 0.4)', accentHover: '#e03e78' },
+                        slate: { 850: '#151e2e', 900: '#0f172a', 950: '#020617' }
+                    },
+                    boxShadow: {
+                        'neon': '0 0 15px rgba(250, 71, 134, 0.4)',
+                        'neon-strong': '0 0 30px rgba(250, 71, 134, 0.6)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* === BASE STYLES & ANIMATIONS === */
+        body { font-family: 'Prompt', sans-serif; overflow-x: hidden; transition: background-color 0.4s, color 0.4s; }
+        .step-content { display: none; animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
+        .step-content.active { display: block; }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+        
+        /* === FORMS & INPUTS === */
+        textarea, input, select { resize: none; transition: all 0.3s ease; }
+        .dark textarea, .dark input, .dark select { background-color: rgba(30, 41, 59, 0.6); backdrop-filter: blur(8px); border-color: rgba(71, 85, 105, 0.5); color: #f8fafc; }
+        .dark textarea:focus, .dark input:focus, .dark select:focus { border-color: #fa4786; box-shadow: 0 0 0 2px rgba(250, 71, 134, 0.3), inset 0 0 15px rgba(250, 71, 134, 0.1); outline: none; background-color: rgba(30, 41, 59, 0.9); }
+        textarea:focus, input:focus, select:focus { border-color: #fa4786; outline: none; box-shadow: 0 0 0 2px rgba(250, 71, 134, 0.3); }
+
+        #admin-scenario-input:empty:before { content: attr(placeholder); color: #94a3b8; pointer-events: none; display: block; }
+        
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background-color: #334155; }
+        .dark ::-webkit-scrollbar-thumb:hover { background-color: #fa4786; }
+
+        .text-glow { text-shadow: 0 0 12px rgba(250, 71, 134, 0.7); }
+        .border-glow { box-shadow: inset 0 0 20px rgba(250, 71, 134, 0.15); border-color: rgba(250, 71, 134, 0.4); }
+        .modal-backdrop { background-color: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px); }
+        .toast { animation: slideInRight 0.4s ease-out forwards; }
+
+        /* === DRAG & DROP === */
+        .draggable-item { cursor: grab; user-select: none; transition: transform 0.2s, box-shadow 0.2s; }
+        .draggable-item:active { cursor: grabbing; }
+        .draggable-item.dragging { opacity: 0.5; transform: scale(0.95); }
+        .drop-zone { transition: all 0.3s ease; }
+
+        .chip-mode {
+            max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0.35rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 10;
+        }
+        .chip-mode:hover, .chip-mode:active { max-width: 250px; white-space: normal; border-radius: 1rem; z-index: 50; transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        
+        #export-canvas-container { position: absolute; top: -9999px; left: -9999px; width: 1200px; background-color: #0f172a; color: white; z-index: -10; }
+
+        /* === PRINTING STYLES (A4 Landscape 5-Page Grid) === */
+        @media print {
+            body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            nav, #footer-nav, #btn-manual, .no-print, .toast-container, #admin-dashboard { display: none !important; }
+            #admin-view-modal { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important; max-height: none !important; overflow: visible !important; background: white !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
+            .print-slide { width: 297mm; height: 209mm; page-break-after: always; break-after: page; display: flex !important; flex-direction: column !important; justify-content: flex-start !important; padding: 15mm !important; box-sizing: border-box !important; background: #0f172a !important; color: white !important; overflow: hidden !important; }
+            .print-slide * { color: white !important; }
+            .print-slide input, .print-slide textarea, .print-slide select { background: rgba(255,255,255,0.05) !important; color: white !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+            .bg-slate-900, .bg-slate-950, .dark\.bg-slate-900 { background-color: #0f172a !important; }
+            .text-slate-800, .text-slate-700 { color: #cbd5e1 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 h-screen flex flex-col transition-colors duration-500 selection:bg-ntb-accent selection:text-white relative">
+
+    <div id="toast-container" class="fixed top-20 right-4 md:right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
+    <nav class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-sm border-b border-slate-200 dark:border-slate-800/80 px-4 md:px-8 py-3 flex justify-between items-center shrink-0 z-30 sticky top-0">
+        <div class="flex items-center gap-4">
+            <div class="bg-slate-900 dark:bg-black border border-slate-700 text-ntb-accent p-2.5 rounded-xl shadow-neon">
+                <i class="fa-solid fa-bolt text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg md:text-xl leading-tight dark:text-white tracking-wide">TURBO <span class="font-light">Worksheet</span></h1>
+                <p class="text-[10px] md:text-xs text-slate-500 dark:text-ntb-accent tracking-widest uppercase font-semibold">Premium Executive Mode</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-5 pointer-events-auto">
+            <span id="step-indicator" class="text-sm font-medium text-slate-500 dark:text-slate-400 hidden md:block tracking-wide">Registration</span>
+            <button id="theme-toggle" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-ntb-accent dark:hover:text-ntb-accent transition-all shadow-sm">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-amber-300"></i>
+            </button>
+            <button id="btn-secret-admin" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-600 hover:text-ntb-accent dark:hover:text-ntb-accent transition-colors" title="Admin Access">
+                <i class="fa-solid fa-user-shield text-sm"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="w-full bg-slate-200 dark:bg-slate-800 h-1 z-20 relative">
+        <div id="progress-bar" class="bg-ntb-accent h-1 transition-all duration-700 ease-out shadow-neon-strong" style="width: 0%;"></div>
+    </div>
+
+    <main class="flex-grow overflow-y-auto p-4 md:p-8 flex justify-center pb-10 relative">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-ntb-accent opacity-5 dark:opacity-[0.04] blur-[120px] rounded-full pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600 opacity-5 dark:opacity-[0.03] blur-[100px] rounded-full pointer-events-none"></div>
+
+        <div class="w-full max-w-[1200px] bg-white/80 dark:bg-slate-900/50 backdrop-blur-2xl rounded-[2rem] shadow-2xl dark:shadow-glass border border-white/20 dark:border-slate-700/50 flex flex-col relative min-h-[calc(100vh-12rem)]">
+            
+            <div class="p-6 md:p-12 flex-grow pb-10">
+                
+                <div id="step-0" class="step-content active max-w-2xl mx-auto mt-6">
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full border border-slate-200 dark:border-slate-700/50 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 text-ntb-accent mb-4 shadow-neon">
+                            <i class="fa-solid fa-fingerprint text-3xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold dark:text-white tracking-wide">ข้อมูลผู้วิเคราะห์ (ระบุข้อมูลเพื่อเริ่มทำข้อสอบ)</h2>
+                    </div>
+                    <div class="bg-white/50 dark:bg-slate-800/40 p-6 md:p-8 rounded-3xl border border-slate-100 dark:border-slate-700/50 shadow-inner space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">รหัสพนักงาน (8 หลัก) *</label>
+                                <input type="text" id="inp-emp-id" maxlength="8" class="w-full rounded-xl p-3 text-base font-mono tracking-widest text-center" placeholder="00123456" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">ชื่อจริง - นามสกุล *</label>
+                                <input type="text" id="inp-fullname" class="w-full rounded-xl p-3 text-base" placeholder="กรอกชื่อและนามสกุล">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">ชื่อเล่น *</label>
+                                <input type="text" id="inp-nickname" class="w-full rounded-xl p-3 text-base" placeholder="ระบุชื่อเล่น">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">รุ่นที่อบรม *</label>
+                                <select id="inp-batch" class="w-full rounded-xl p-3 text-base bg-white dark:bg-slate-800 border" onchange="toggleCustomInput('inp-batch', 'batch-custom-wrap')">
+                                    <option value="">-- เลือกรุ่น --</option>
+                                    <option value="รุ่น 1">รุ่น 1</option>
+                                    <option value="รุ่น 2">รุ่น 2</option>
+                                    <option value="รุ่น 3">รุ่น 3</option>
+                                    <option value="อื่น ๆ">อื่น ๆ (ระบุ)</option>
+                                </select>
+                                <div id="batch-custom-wrap" class="mt-2 hidden">
+                                    <input type="text" id="inp-batch-custom" class="w-full rounded-xl p-2 text-sm" placeholder="ระบุรุ่นอบรมของคุณ">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">ตำแหน่ง *</label>
+                                <select id="inp-position" class="w-full rounded-xl p-3 text-base bg-white dark:bg-slate-800 border" onchange="toggleCustomInput('inp-position', 'position-custom-wrap')">
+                                    <option value="">-- เลือกตำแหน่ง --</option>
+                                    <option value="SAM">SAM</option>
+                                    <option value="AM">AM</option>
+                                    <option value="DAM">DAM</option>
+                                    <option value="อื่น ๆ">อื่น ๆ (ระบุ)</option>
+                                </select>
+                                <div id="position-custom-wrap" class="mt-2 hidden">
+                                    <input type="text" id="inp-position-custom" class="w-full rounded-xl p-2 text-sm" placeholder="ระบุตำแหน่งของคุณ">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">เขต / ภูมิภาค *</label>
+                            <select id="inp-region" class="w-full rounded-xl p-3 text-base bg-white dark:bg-slate-800 border">
+                                <option value="">-- เลือกภูมิภาค --</option>
+                                <option value="กรุงเทพฯ-ปริมณฑลตะวันตก">กรุงเทพฯ-ปริมณฑลตะวันตก</option>
+                                <option value="ภาคใต้">ภาคใต้</option>
+                                <option value="ภาคตะวันออก">ภาคตะวันออก</option>
+                                <option value="ภาคกลาง">ภาคกลาง</option>
+                                <option value="กรุงเทพฯ-ปริมณฑลตะวันออก">กรุงเทพฯ-ปริมณฑลตะวันออก</option>
+                                <option value="ภาคตะวันออกเฉียงเหนือตอนล่าง">ภาคตะวันออกเฉียงเหนือตอนล่าง</option>
+                                <option value="ภาคตะวันออกเฉียงเหนือตอนบน">ภาคตะวันออกเฉียงเหนือตอนบน</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step-1" class="step-content">
+                    <div class="mb-6 border-b border-slate-200 dark:border-slate-800/50 pb-4">
+                        <span class="inline-block border border-ntb-accent/30 bg-ntb-accent/10 text-ntb-accent px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-3"><i class="fa-solid fa-ear-listen mr-2"></i>Phase 1 & 2</span>
+                        <h2 class="text-2xl md:text-3xl font-bold dark:text-white mb-1">ฟังเสียงจากหน้างาน & แยกแยะความจริง</h2>
+                        <p class="text-rose-500 font-bold text-sm"><i class="fa-solid fa-circle-exclamation mr-1"></i> คำเตือน: ต้องตอบทั้งข้อเท็จจริงและข้อคิดเห็น ให้ครบทุกช่องที่ปรากฏบนหน้าจอ</p>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/40 dark:to-slate-900/40 border border-slate-200 dark:border-slate-700/50 rounded-3xl p-6 shadow-sm mb-8 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-ntb-accent shadow-neon-strong"></div>
+                        <p id="scenario-text" class="text-base md:text-lg leading-relaxed dark:text-slate-300 relative z-10 font-light">
+                            <i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังเตรียมข้อมูลสถานการณ์...
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white/60 dark:bg-slate-850/60 backdrop-blur-sm rounded-3xl p-6 border border-slate-200 dark:border-slate-700/50 shadow-sm flex flex-col">
+                            <h3 class="font-bold text-slate-700 dark:text-slate-300 text-lg mb-1 flex items-center"><i class="fa-solid fa-check-circle mr-2 text-xl text-emerald-500"></i>ข้อเท็จจริง (Facts)</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 font-medium">สกัดข้อมูลที่พิสูจน์ได้ เกิดขึ้นจริง จากข้อความด้านบน</p>
+                            <div id="fact-list" class="space-y-4 flex-grow">
+                                <div class="relative w-full"><textarea class="w-full rounded-2xl p-4 text-sm h-24 shadow-inner pr-10" placeholder="ระบุข้อเท็จจริงประการที่ 1..."></textarea></div>
+                            </div>
+                            <button onclick="addDynamicTextBox('fact-list', 'ระบุข้อเท็จจริงเพิ่มเติม...')" class="mt-4 w-full py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"><i class="fa-solid fa-plus mr-2"></i>เพิ่มกล่องข้อเท็จจริง</button>
+                        </div>
+                        <div class="bg-white/60 dark:bg-slate-850/60 backdrop-blur-sm rounded-3xl p-6 border border-slate-200 dark:border-slate-700/50 shadow-sm flex flex-col">
+                            <h3 class="font-bold text-slate-700 dark:text-slate-300 text-lg mb-1 flex items-center"><i class="fa-solid fa-comment-dots mr-2 text-xl text-blue-500"></i>ข้อคิดเห็น (Opinions)</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 font-medium">สกัดข้อมูลที่เป็นเพียงความรู้สึก หรือการคาดเดา</p>
+                            <div id="opinion-list" class="space-y-4 flex-grow">
+                                <div class="relative w-full"><textarea class="w-full rounded-2xl p-4 text-sm h-24 shadow-inner pr-10" placeholder="ระบุข้อคิดเห็นประการที่ 1..."></textarea></div>
+                            </div>
+                            <button onclick="addDynamicTextBox('opinion-list', 'ระบุข้อคิดเห็นเพิ่มเติม...')" class="mt-4 w-full py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"><i class="fa-solid fa-plus mr-2"></i>เพิ่มกล่องข้อคิดเห็น</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 text-center shadow-neon border-glow relative overflow-hidden">
+                        <h3 class="font-bold text-white text-xl mb-3 text-glow"><i class="fa-solid fa-bullseye text-ntb-accent mr-2"></i>เลือก 1 Fact เพื่อนำไปแก้ปัญหา</h3>
+                        <input type="text" id="target-fact" class="w-full md:w-3/4 mx-auto block bg-slate-800/80 border border-slate-600 text-white rounded-xl p-4 text-center font-medium text-base focus:border-ntb-accent transition-all" placeholder="พิมพ์ Fact ที่ส่งผลกระทบสูงสุดที่ต้องการแก้ไข...">
+                    </div>
+                </div>
+
+                <div id="step-2" class="step-content">
+                    <div class="mb-6 border-b border-slate-200 dark:border-slate-800/50 pb-4">
+                        <span class="inline-block border border-ntb-accent/30 bg-ntb-accent/10 text-ntb-accent px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-3"><i class="fa-solid fa-microscope mr-2"></i>PHASE 3</span>
+                        <h2 class="text-2xl md:text-3xl font-bold dark:text-white mb-1">ขยายภาพรากปัญหา (4M1E)</h2>
+                        <p class="text-rose-500 font-bold text-sm"><i class="fa-solid fa-circle-exclamation mr-1"></i> คำเตือน: ต้องตอบทุกด้านของ 4M1E อย่างน้อยปัจจัยละ 1 ข้อ และห้ามปล่อยกล่องที่เปิดไว้ว่างเปล่า</p>
+                    </div>
+
+                    <div class="bg-white/50 dark:bg-slate-900/50 backdrop-blur border border-slate-200 dark:border-slate-800 px-6 py-4 rounded-xl mb-6 flex flex-col md:flex-row items-center gap-3 shadow-sm">
+                        <span class="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs"><i class="fa-solid fa-thumbtack text-ntb-accent mr-2"></i>เป้าหมายหลัก (Fact ที่เลือก):</span> 
+                        <span id="display-fact" class="font-bold text-lg text-slate-800 dark:text-white">...</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="m4e1-container">
+                        </div>
+                </div>
+
+                <div id="step-3" class="step-content">
+                    <div class="mb-6 border-b border-slate-200 dark:border-slate-800/50 pb-4">
+                        <span class="inline-block border border-ntb-accent/30 bg-ntb-accent/10 text-ntb-accent px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-3"><i class="fa-solid fa-bullseye mr-2"></i>PHASE 4</span>
+                        <h2 class="text-2xl md:text-3xl font-bold dark:text-white mb-1">ตีกรอบสิ่งที่ควบคุมได้ (Focus)</h2>
+                        <p class="text-rose-500 font-bold text-sm" id="drag-instruction"><i class="fa-solid fa-circle-exclamation mr-1"></i> คำเตือน: ลากจัดกลุ่มสิ่งที่ควบคุมได้/ไม่ได้ให้ครบทุกปัจจัย (กล่องรวมสาเหตุต้องว่างเปล่า)</p>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <div class="lg:w-1/3 bg-white/60 dark:bg-slate-850/60 backdrop-blur border border-slate-200 dark:border-slate-700/50 rounded-3xl p-5 h-[500px] flex flex-col shadow-sm">
+                            <h3 class="font-bold text-slate-700 dark:text-slate-300 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2"><i class="fa-solid fa-inbox text-slate-400 mr-2"></i>กล่องรวมสาเหตุ</h3>
+                            <div id="pool-unassigned" class="flex-grow overflow-y-auto space-y-3 pr-2 pb-10 drop-zone rounded-xl" ondrop="drop(event, 'unassigned')" ondragover="allowDrop(event)">
+                                </div>
+                        </div>
+
+                        <div class="lg:w-2/3 flex flex-col items-center justify-center relative min-h-[500px] bg-slate-50/50 dark:bg-slate-900/30 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden p-6">
+                            <div id="drop-out" class="w-full max-w-[440px] aspect-square rounded-full border-[3px] border-dashed border-rose-500/40 bg-rose-500/5 dark:bg-rose-900/20 relative flex flex-col items-center pt-8 drop-zone transition-all" ondrop="drop(event, 'out')" ondragover="allowDrop(event)">
+                                <span class="text-rose-600 dark:text-rose-400 font-bold bg-white dark:bg-slate-950 border border-rose-200 dark:border-rose-800/50 px-4 py-1 rounded-full text-xs shadow-md absolute -top-3"><i class="fa-solid fa-ban mr-1"></i>วงนอก (ควบคุมไม่ได้)</span>
+                                <div id="pool-out-control" class="w-full px-6 mt-4 h-[100px] overflow-y-auto flex flex-wrap gap-2 justify-center content-start p-2"></div>
+
+                                <div id="drop-in" class="w-[60%] aspect-square rounded-full border-4 border-emerald-500 bg-emerald-50/80 dark:bg-emerald-900/40 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pt-8 shadow-md drop-zone transition-all backdrop-blur-sm" ondrop="drop(event, 'in')" ondragover="allowDrop(event)">
+                                    <span class="text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800/50 px-3 py-1 rounded-full text-xs absolute -top-3 shadow-md"><i class="fa-solid fa-hand-holding-hand mr-1"></i>วงใน (ควบคุมได้)</span>
+                                    <div id="pool-in-control" class="w-full px-4 mt-2 h-[80%] overflow-y-auto flex flex-wrap gap-2 justify-center content-start p-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-neon border-glow text-center">
+                        <label class="block font-bold text-white mb-3 text-lg tracking-wide"><i class="fa-solid fa-crosshairs text-ntb-accent mr-2"></i>เลือกลงมือแก้ 1 รากปัญหาจาก <span class="text-emerald-400">"วงใน"</span> เพื่อไปต่อ</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                            <input type="text" id="target-cause" class="md:col-span-2 bg-slate-800/80 border border-slate-600 rounded-xl p-4 text-white text-base shadow-inner text-center" placeholder="พิมพ์รากปัญหาที่เลือกมาขจัด...">
+                            <select id="target-cause-cat" class="bg-slate-800/80 border border-slate-600 rounded-xl p-4 text-white text-base shadow-inner">
+                                <option value="">-- เลือกหมวดหมู่ 4M1E --</option>
+                                <option value="Man (คน)">Man (คน)</option>
+                                <option value="Machine (อุปกรณ์)">Machine (อุปกรณ์)</option>
+                                <option value="Material (วัตถุดิบ)">Material (วัตถุดิบ)</option>
+                                <option value="Method (ขั้นตอน)">Method (ขั้นตอน)</option>
+                                <option value="Environment (สภาพแวดล้อม)">Environment (สภาพแวดล้อม)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step-4" class="step-content">
+                    <div class="mb-6 border-b border-slate-200 dark:border-slate-800/50 pb-4">
+                        <span class="inline-block border border-ntb-accent/30 bg-ntb-accent/10 text-ntb-accent px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-3"><i class="fa-solid fa-rocket mr-2"></i>PHASE 5</span>
+                        <h2 class="text-2xl md:text-3xl font-bold dark:text-white mb-1">วิชา "ก-ข-ค" (The TURBO Triad)</h2>
+                        <p class="text-rose-500 font-bold text-sm"><i class="fa-solid fa-circle-exclamation mr-1"></i> คำเตือน: ต้องตอบวิธีการแก้ไขปัญหาให้ครบทั้ง 3 ระดับ ทั้ง ก / ข / ค (ห้ามปล่อยว่างช่องใดๆ)</p>
+                        
+                        <div class="bg-white/50 dark:bg-slate-900/50 backdrop-blur border border-slate-200 dark:border-slate-800 px-5 py-3 rounded-xl mt-4 inline-flex items-center shadow-sm">
+                            <span class="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest font-bold mr-2"><i class="fa-solid fa-crosshairs text-ntb-accent mr-1"></i>รากปัญหาเป้าหมาย:</span>
+                            <span id="display-cause" class="font-bold text-slate-800 dark:text-white text-base">...</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full overflow-hidden rounded-3xl border border-slate-300 dark:border-slate-700/50 shadow-lg">
+                        <table class="w-full text-sm text-left bg-white dark:bg-slate-850">
+                            <thead class="bg-slate-900 text-slate-300 uppercase text-xs tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-4 w-[15%] text-center">ประเภท</th>
+                                    <th class="px-4 py-4 w-[25%]">ลงมือทำ (Action)</th>
+                                    <th class="px-4 py-4 w-[20%]">ผู้ที่เกี่ยวข้อง</th>
+                                    <th class="px-4 py-4 w-[20%]">กำหนดเสร็จ</th>
+                                    <th class="px-4 py-4 w-[20%]">วิธีการวัดผล</th>
+                                </tr>
+                            </thead>
+                            <tbody id="triad-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/50">
+                                <tr>
+                                    <td class="bg-rose-500 text-white text-center p-4 align-middle">
+                                        <div class="font-bold text-xl mb-0.5">ก.<br>แก้ทันที</div>
+                                        <div class="text-[9px] uppercase tracking-widest opacity-80">(Correction)</div>
+                                    </td>
+                                    <td class="p-3"><textarea id="triad-k-action" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="แอคชั่นดับไฟด่วน..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-k-who" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="ผู้รับผิดชอบ..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-k-when" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="เช่น ภายในวันนี้..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-k-measure" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="ตัวชี้วัดความสำเร็จด่วน..."></textarea></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-blue-700 text-white text-center p-4 align-middle">
+                                        <div class="font-bold text-xl mb-0.5">ข.<br>ขุดราก</div>
+                                        <div class="text-[9px] uppercase tracking-widest opacity-80">(Corrective)</div>
+                                    </td>
+                                    <td class="p-3"><textarea id="triad-kh-action" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="แก้ที่ต้นเหตุรากปัญหา..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-kh-who" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="ผู้รับผิดชอบ..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-kh-when" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="เช่น สิ้นสัปดาห์นี้..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-kh-measure" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="ตัวชี้วัดระดับรากปัญหา..."></textarea></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-emerald-600 text-white text-center p-4 align-middle">
+                                        <div class="font-bold text-xl mb-0.5">ค.<br>คิดระบบ</div>
+                                        <div class="text-[9px] uppercase tracking-widest opacity-80">(Preventive)</div>
+                                    </td>
+                                    <td class="p-3"><textarea id="triad-c-action" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="สร้างมาตรฐานใหม่เพื่อไม่ให้เกิดซ้ำ..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-c-who" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="ผู้รับผิดชอบ..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-c-when" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="เช่น สิ้นเดือนนี้..."></textarea></td>
+                                    <td class="p-3"><textarea id="triad-c-measure" class="w-full min-h-[90px] p-3 rounded-xl text-xs" placeholder="ตัวชี้วัดความยั่งยืนของระบบ..."></textarea></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="step-5" class="step-content">
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-900 text-ntb-accent mb-3 shadow-neon">
+                            <i class="fa-solid fa-clipboard-check text-3xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold dark:text-white mb-2">สรุปแผนปฏิบัติการ TURBO</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-base">โปรดตรวจทานความถูกต้องอย่างละเอียดรอบคอบก่อนกดส่งแผนงาน</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-100/50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-200 dark:border-slate-800" id="summary-bento"></div>
+                    <div id="submit-status" class="hidden text-center mt-8 py-6"></div>
+                </div>
+
+            </div>
+
+            <div id="footer-nav" class="sticky bottom-0 z-40 mt-auto bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-t border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center rounded-b-[2rem]">
+                <button id="btn-prev" class="px-6 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> ย้อนกลับ
+                </button>
+                <button id="btn-next" class="px-8 py-3 bg-ntb-accent text-white rounded-xl font-bold hover:bg-ntb-accentHover shadow-neon transition-all">
+                    ถัดไป <i class="fa-solid fa-arrow-right mr-1"></i>
+                </button>
+                <button id="btn-submit" class="hidden px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-500 shadow-md transition-all">
+                    ยืนยันแผนงาน <i class="fa-solid fa-paper-plane mr-1"></i>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <a href="https://canva.link/fepybt3pcd9p304" target="_blank" id="btn-manual" class="fixed bottom-6 right-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-50 border">
+        <i class="fa-solid fa-book-open text-base"></i>
+    </a>
+
+    <div id="assign-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-[60]">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6 w-11/12 max-w-sm border" id="assign-modal-content">
+            <h3 class="text-lg font-bold dark:text-white mb-4 text-center">จัดกลุ่มสาเหตุนี้</h3>
+            <p id="assign-item-text" class="text-slate-700 dark:text-slate-300 text-sm mb-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl text-center shadow-inner"></p>
+            <div class="space-y-3">
+                <button class="w-full py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 flex justify-center items-center gap-2" onclick="assignItem('in')">
+                    <i class="fa-solid fa-hand-holding-hand"></i> วงใน (ควบคุมได้)
+                </button>
+                <button class="w-full py-3 rounded-xl font-bold text-white bg-rose-600 hover:bg-rose-500 flex justify-center items-center gap-2" onclick="assignItem('out')">
+                    <i class="fa-solid fa-ban"></i> วงนอก (ควบคุมไม่ได้)
+                </button>
+                <button class="w-full py-2.5 text-sm font-semibold text-slate-500" onclick="closeAssignModal()">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-login-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-[60]">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-8 w-11/12 max-w-md text-center border relative">
+            <h3 class="text-xl font-bold dark:text-white mb-1">Admin Access Only</h3>
+            <p class="text-slate-500 text-xs mb-6">กรุณาระบุรหัสผ่านแอดมินเพื่อตรวจสอบข้อมูล</p>
+            <input type="password" id="admin-pwd" class="w-full border rounded-xl p-3 text-center mb-6 text-lg tracking-[0.5em]" placeholder="••••••••">
+            <div class="flex gap-4">
+                <button class="flex-1 py-3 bg-slate-100 dark:bg-slate-800 rounded-xl font-semibold" onclick="document.getElementById('admin-login-modal').classList.add('hidden')">ยกเลิก</button>
+                <button class="flex-1 py-3 bg-ntb-accent text-white rounded-xl font-bold shadow-neon" onclick="checkAdminPwd()">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-dashboard" class="fixed inset-0 bg-slate-50 dark:bg-slate-950 hidden z-50 overflow-y-auto">
+        <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b px-6 py-4 flex justify-between items-center sticky top-0 z-10">
+            <h1 class="font-bold text-xl dark:text-white"><i class="fa-solid fa-database text-ntb-accent mr-2"></i>Data Center หลังบ้าน</h1>
+            <div class="flex gap-3">
+                <button id="btn-export-csv" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-500"><i class="fa-solid fa-file-csv mr-1"></i>Export CSV</button>
+                <button class="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold" onclick="document.getElementById('admin-dashboard').classList.add('hidden')">ปิดหน้าจอ</button>
+            </div>
+        </div>
+        
+        <div class="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border flex flex-wrap gap-3 items-center">
+                <input type="text" id="admin-search" class="p-2.5 rounded-lg text-xs border w-full md:w-60" placeholder="ค้นหา รหัส, ชื่อ, หรือ ปัญหาหลัก...">
+                <select id="filter-batch" class="p-2.5 rounded-lg text-xs border bg-transparent"><option value="">ทุกรุ่นอบรม</option></select>
+                <select id="filter-position" class="p-2.5 rounded-lg text-xs border bg-transparent"><option value="">ทุกตำแหน่ง</option></select>
+                <select id="filter-region" class="p-2.5 rounded-lg text-xs border bg-transparent"><option value="">ทุกภูมิภาค</option></select>
+                <select id="filter-cat" class="p-2.5 rounded-lg text-xs border bg-transparent">
+                    <option value="">ทุกหมวดหมู่ (4M1E)</option>
+                    <option value="Man (คน)">Man (คน)</option>
+                    <option value="Machine (อุปกรณ์)">Machine (อุปกรณ์)</option>
+                    <option value="Material (วัตถุดิบ)">Material (วัตถุดิบ)</option>
+                    <option value="Method (ขั้นตอน)">Method (ขั้นตอน)</option>
+                    <option value="Environment (สภาพแวดล้อม)">Environment (สภาพแวดล้อม)</option>
+                </select>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border overflow-hidden shadow-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 dark:bg-slate-950 border-b text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                            <tr>
+                                <th class="px-4 py-4">วันที่</th>
+                                <th class="px-4 py-4">รหัสพนักงาน</th>
+                                <th class="px-4 py-4">ชื่อ - นามสกุล (ชื่อเล่น)</th>
+                                <th class="px-4 py-4">รุ่น</th>
+                                <th class="px-4 py-4">ตำแหน่ง</th>
+                                <th class="px-4 py-4">ปัญหาหลัก (What)</th>
+                                <th class="px-4 py-4">หมวดหมู่ (4M1E)</th>
+                                <th class="px-4 py-4 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-view-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-[70] p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl p-6 w-full max-w-6xl max-h-[92vh] flex flex-col border relative">
+            <div class="flex justify-between items-center mb-4 no-print border-b pb-3">
+                <div>
+                    <h3 class="text-xl font-bold dark:text-white" id="admin-view-title">ใบงานผู้เข้าอบรม</h3>
+                    <p class="text-xs text-slate-500 mt-0.5" id="admin-view-meta">Loading...</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:scale-105 transition-transform"><i class="fa-solid fa-file-pdf mr-1"></i>พิมพ์เป็น PDF (แนวนอน)</button>
+                    <button class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-rose-500" onclick="document.getElementById('admin-view-modal').classList.add('hidden')"><i class="fa-solid fa-times"></i></button>
+                </div>
+            </div>
+            <div class="overflow-y-auto flex-grow pr-1 space-y-8" id="admin-slides-container">
+                </div>
+        </div>
+    </div>
+
+    <div id="export-canvas-container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Restore dynamic config bindings exactly as the original code
+        let app, auth, db;
+        let isFirebaseReady = false;
+        let currentUser = null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'turbo-worksheet-app';
+
+        let currentStep = 0, totalSteps = 6, causeItems = [];
+        let allSubmissions = [], currentAssignId = null;
+
+        const defaultScenario = `"พี่ครับ เรื่องยอดประกันรถยนต์เดือนนี้ ผมว่าสาขาเราคงเข็นไม่ขึ้นจริงๆ ลูกค้าที่มากู้สินเชื่อช่วงนี้ <strong>ไม่มีใครสนใจประกันเลย</strong> เค้าบอกว่าแค่เงินกินข้าวยังจะไม่พอ...<br><br>แถมพอผมพยายามอธิบายแผนประกันตัวใหม่ <strong>ระบบมันดันบังคับให้ต้องกรอกข้อมูลประวัติลูกค้าซ้ำสองรอบ</strong> ทั้งแอปฝั่งสินเชื่อและฝั่งประกัน ลูกค้าเห็นหน้าจอโหลดนานก็หงุดหงิดแล้วพี่ เมื่อวานมีลูกค้า <strong>15 คนที่อนุมัติสินเชื่อผ่าน</strong> แต่ผม<strong>เสนอประกันไปได้แค่ 3 คนเอง</strong>...คู่มือก็ใช้ภาษาทางการเกินไปแถมพี่สมรบอกให้รีบปิดยอดสินเชื่อดีกว่าคอมมิชชั่นเยอะกว่า"`;
+
+        const m4e1Categories = [
+            { id: 'man', label: 'Man (คน)', desc: 'ทักษะ, ความรู้, ทัศนคติ, สภาพจิตใจ', icon: 'fa-user', color: 'text-blue-500' },
+            { id: 'machine', label: 'Machine (อุปกรณ์)', desc: 'ฮาร์ดแวร์, ซอฟต์แวร์, เครื่องมือ', icon: 'fa-laptop', color: 'text-purple-500' },
+            { id: 'material', label: 'Material (วัตถุดิบ)', desc: 'ปัจจัยนำเข้า, วัตถุดิบ, สต็อกสินค้า, แหล่งข้อมูล หรือสื่อการขายที่ใช้ในการทำงาน', icon: 'fa-box', color: 'text-amber-500' },
+            { id: 'method', label: 'Method (ขั้นตอน)', desc: 'กระบวนการทำงาน, กฎระเบียบ', icon: 'fa-sitemap', color: 'text-emerald-500' },
+            { id: 'env', label: 'Environment (สภาพแวดล้อม)', desc: 'วัฒนธรรมองค์กร, สถานที่', icon: 'fa-building', color: 'text-rose-500' }
+        ];
+
+        const showToast = (msg, type = 'error') => {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const color = type === 'error' ? 'bg-rose-500 shadow-md' : 'bg-emerald-500 shadow-md';
+            toast.className = `toast ${color} text-white px-5 py-3 rounded-xl flex items-center gap-2 font-semibold text-sm z-[100]`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'error' ? 'fa-triangle-exclamation' : 'fa-check-circle'}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        };
+
+        window.toggleCustomInput = (selectId, wrapId) => {
+            const selectEl = document.getElementById(selectId);
+            const wrapEl = document.getElementById(wrapId);
+            if(selectEl && selectEl.value === 'อื่น ๆ') wrapEl.classList.remove('hidden');
+            else if(wrapEl) wrapEl.classList.add('hidden');
+        };
+
+        window.addDynamicTextBox = (containerId, placeholderText) => {
+            const container = document.getElementById(containerId);
+            const wrapper = document.createElement('div');
+            wrapper.className = "relative w-full group mt-2";
+            wrapper.innerHTML = `
+                <textarea class="w-full rounded-2xl p-4 text-sm h-24 shadow-inner pr-10" placeholder="${placeholderText}"></textarea>
+                <button type="button" class="absolute top-3 right-3 text-rose-500 hover:text-rose-700 font-bold z-20 text-sm" onclick="this.parentNode.remove()">✖</button>
+            `;
+            container.appendChild(wrapper);
+        };
+
+        window.addDynamicInputBox = (catId) => {
+            const container = document.getElementById(`inputs-${catId}`);
+            const wrapper = document.createElement('div');
+            wrapper.className = "relative w-full group mt-2";
+            wrapper.innerHTML = `
+                <textarea class="w-full rounded-2xl p-3 text-xs text-slate-700 dark:text-slate-300 h-20 shadow-inner pr-8" placeholder="สาเหตุเพิ่มเติม..."></textarea>
+                <button type="button" class="absolute top-2 right-2 text-rose-500 hover:text-rose-700 font-bold z-20 text-xs" onclick="this.parentNode.remove()">✖</button>
+            `;
+            container.appendChild(wrapper);
+        };
+
+        const initM4E1UI = () => {
+            const container = document.getElementById('m4e1-container');
+            if(!container) return;
+            container.innerHTML = '';
+            m4e1Categories.forEach(cat => {
+                const div = document.createElement('div');
+                div.className = "bg-white/60 dark:bg-slate-850/60 border rounded-3xl p-4 shadow-sm flex flex-col h-full";
+                div.innerHTML = `
+                    <div class="${cat.color} mb-2 flex items-center justify-center w-10 h-10 bg-white dark:bg-slate-900 rounded-full shadow-sm"><i class="fa-solid ${cat.icon} text-lg"></i></div>
+                    <h3 class="font-bold text-slate-800 dark:text-white text-sm">${cat.label}</h3>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-3 min-h-[40px] leading-tight font-medium">${cat.desc}</p>
+                    <div id="inputs-${cat.id}" class="space-y-1 flex-grow">
+                        <div class="relative w-full"><textarea class="w-full rounded-2xl p-3 text-xs text-slate-700 dark:text-slate-300 h-20 shadow-inner" placeholder="สาเหตุที่ 1..."></textarea></div>
+                    </div>
+                    <button onclick="addDynamicInputBox('${cat.id}')" class="mt-3 w-full py-2 rounded-xl text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200"><i class="fa-solid fa-plus mr-1"></i>เพิ่มสาเหตุ</button>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        const validateStep = () => {
+            if(currentStep === 0) {
+                const empId = document.getElementById('inp-emp-id').value.trim();
+                const fn = document.getElementById('inp-fullname').value.trim();
+                const nn = document.getElementById('inp-nickname').value.trim();
+                const r = document.getElementById('inp-region').value;
+                let b = document.getElementById('inp-batch').value;
+                let p = document.getElementById('inp-position').value;
+
+                if(b === 'อื่น ๆ') b = document.getElementById('inp-batch-custom').value.trim();
+                if(p === 'อื่น ๆ') p = document.getElementById('inp-position-custom').value.trim();
+
+                if(!empId || empId.length < 8 || !fn || !nn || !r || !b || !p) {
+                    showToast("กรุณากรอกและเลือกข้อมูลลงทะเบียนให้ครบทุกช่องก่อนไปต่อ (รหัสพนักงานต้องมี 8 หลัก)");
+                    return false;
+                }
+            }
+            if(currentStep === 1) {
+                const textareas = document.querySelectorAll('#step-1 textarea');
+                for(let ta of textareas) {
+                    if(!ta.value.trim()) { showToast("กรุณากรอกข้อเท็จจริงและข้อคิดเห็นในทุกช่องที่เปิดไว้ให้ครบถ้วน"); return false; }
+                }
+                if(!document.getElementById('target-fact').value.trim()) { showToast("กรุณาระบุเลือก 1 Fact มุ่งเป้าหมายหลักด้านล่างด้วยค่ะ"); return false; }
+            }
+            if(currentStep === 2) {
+                for(let cat of m4e1Categories) {
+                    const inputs = document.querySelectorAll(`#inputs-${cat.id} textarea`);
+                    if(inputs.length === 0) { showToast(`กรุณาระบุข้อมูลสาเหตุอย่างน้อย 1 ปัจจัยสำหรับมิติ ${cat.label}`); return false; }
+                    let hasContent = false;
+                    for(let inp of inputs) {
+                        if(inp.value.trim()) hasContent = true;
+                        else { showToast("ห้ามทิ้งกล่องข้อความ 4M1E ใดๆ ว่างไว้ โปรดกรอกข้อมูลให้ครบหรือกดกากบาทลบออก"); return false; }
+                    }
+                    if(!hasContent) { showToast(`มิติ ${cat.label} จำเป็นต้องมีคำตอบอย่างน้อย 1 ข้อค่ะ`); return false; }
+                }
+            }
+            if(currentStep === 3) {
+                const unassignedContainer = document.getElementById('pool-unassigned');
+                if(unassignedContainer && unassignedContainer.children.length > 0) { showToast("กรุณาลากจัดกลุ่มสาเหตุทุกข้อที่มีอยู่บนจอลงวงกลมควบคุมให้ครบทั้งหมด 100%"); return false; }
+                if(!document.getElementById('target-cause').value.trim() || !document.getElementById('target-cause-cat').value) {
+                    showToast("กรุณาระบุ 1 รากปัญหาจากวงในและระบุเลือกประเภทหมวดหมู่ 4M1E ให้ครบถ้วนค่ะ"); return false;
+                }
+            }
+            if(currentStep === 4) {
+                const fields = ['triad-k-action', 'triad-k-who', 'triad-k-when', 'triad-k-measure', 'triad-kh-action', 'triad-kh-who', 'triad-kh-when', 'triad-kh-measure', 'triad-c-action', 'triad-c-who', 'triad-c-when', 'triad-c-measure'];
+                for(let id of fields) {
+                    if(!document.getElementById(id).value.trim()) { showToast("กรุณากรอกข้อมูลวิธีการแก้ไขแผนงานวิชา กขค ให้ครบถ้วนทุกระดับ ทั้ง ก, ข, ค"); return false; }
+                }
+            }
+            return true;
+        };
+
+        const getRegistrationData = () => {
+            let b = document.getElementById('inp-batch').value;
+            let p = document.getElementById('inp-position').value;
+            if(b === 'อื่น ๆ') b = document.getElementById('inp-batch-custom').value.trim();
+            if(p === 'อื่น ๆ') p = document.getElementById('inp-position-custom').value.trim();
+            return {
+                empId: document.getElementById('inp-emp-id').value.trim(),
+                fullName: document.getElementById('inp-fullname').value.trim(),
+                nickname: document.getElementById('inp-nickname').value.trim(),
+                batch: b,
+                position: p,
+                region: document.getElementById('inp-region').value
+            };
+        };
+
+        const extractCauses = () => {
+            const oldItems = [...causeItems];
+            causeItems = [];
+            let counter = 1;
+            m4e1Categories.forEach(cat => {
+                const inputs = document.querySelectorAll(`#inputs-${cat.id} textarea`);
+                inputs.forEach(inp => {
+                    const val = inp.value.trim();
+                    if(val) {
+                        const matched = oldItems.find(o => o.text === val && o.category === cat.label);
+                        causeItems.push({
+                            id: matched ? matched.id : `c-${new Date().getTime()}-${counter++}`,
+                            text: val,
+                            category: cat.label,
+                            icon: cat.icon,
+                            status: matched ? matched.status : 'unassigned'
+                        });
+                    }
+                });
+            });
+            renderPools();
+        };
+
+        const renderPools = () => {
+            const unassigned = document.getElementById('pool-unassigned');
+            const inControl = document.getElementById('pool-in-control');
+            const outControl = document.getElementById('pool-out-control');
+            if(!unassigned) return;
+            unassigned.innerHTML = ''; inControl.innerHTML = ''; outControl.innerHTML = '';
+
+            causeItems.forEach(item => {
+                const div = document.createElement('div');
+                div.id = item.id;
+                div.draggable = true;
+                
+                if (item.status === 'unassigned') {
+                    div.className = "text-left text-xs p-3 rounded-xl border shadow-sm w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium cursor-pointer flex items-start gap-2";
+                    div.innerHTML = `<i class="fa-solid ${item.icon} mt-0.5 text-ntb-accent"></i> <span>${item.text} <small class="block text-[9px] text-slate-400">(${item.category})</small></span>`;
+                } else {
+                    div.className = "chip-mode draggable-item cursor-pointer flex items-center gap-1 bg-ntb-accent text-white font-medium text-[11px]";
+                    if(item.status === 'in') div.className = div.className.replace('bg-ntb-accent', 'bg-emerald-600');
+                    if(item.status === 'out') div.className = div.className.replace('bg-ntb-accent', 'bg-rose-600');
+                    div.innerHTML = `<i class="fa-solid ${item.icon} text-[9px]"></i> <span>${item.text}</span>`;
+                }
+
+                div.onclick = () => { currentAssignId = item.id; document.getElementById('assign-item-text').innerText = item.text; document.getElementById('assign-modal').classList.remove('hidden'); };
+                div.ondragstart = (e) => { e.dataTransfer.setData("text/plain", item.id); };
+                
+                if (item.status === 'unassigned') unassigned.appendChild(div);
+                else if (item.status === 'in') inControl.appendChild(div);
+                else if (item.status === 'out') outControl.appendChild(div);
+            });
+        };
+
+        window.allowDrop = (e) => { e.preventDefault(); };
+        window.drop = (e, status) => {
+            e.preventDefault();
+            const id = e.dataTransfer.getData("text/plain");
+            const item = causeItems.find(i => i.id === id);
+            if(item) { item.status = status; renderPools(); }
+        };
+
+        window.assignItem = (status) => {
+            const item = causeItems.find(i => i.id === currentAssignId);
+            if(item) { item.status = status; renderPools(); }
+            closeAssignModal();
+        };
+        window.closeAssignModal = () => document.getElementById('assign-modal').classList.add('hidden');
+
+        const gatherAllData = () => {
+            const reg = getRegistrationData();
+            const facts = Array.from(document.querySelectorAll('#fact-list textarea')).map(t => t.value.trim()).filter(v => v);
+            const opinions = Array.from(document.querySelectorAll('#opinion-list textarea')).map(t => t.value.trim()).filter(v => v);
+            return {
+                ...reg,
+                facts, opinions,
+                targetFact: document.getElementById('target-fact').value.trim(),
+                causes: causeItems,
+                targetCause: document.getElementById('target-cause').value.trim(),
+                targetCauseCat: document.getElementById('target-cause-cat').value,
+                triad: {
+                    k: { action: document.getElementById('triad-k-action').value, who: document.getElementById('triad-k-who').value, when: document.getElementById('triad-k-when').value, measure: document.getElementById('triad-k-measure').value },
+                    kh: { action: document.getElementById('triad-kh-action').value, who: document.getElementById('triad-kh-who').value, when: document.getElementById('triad-kh-when').value, measure: document.getElementById('triad-kh-measure').value },
+                    c: { action: document.getElementById('triad-c-action').value, who: document.getElementById('triad-c-who').value, when: document.getElementById('triad-c-when').value, measure: document.getElementById('triad-c-measure').value }
+                },
+                timestamp: new Date().toISOString()
+            };
+        };
+
+        const renderBentoSummary = (data, elementId) => {
+            const el = document.getElementById(elementId);
+            if(!el) return;
+            el.innerHTML = `
+                <div class="col-span-1 md:col-span-3 bg-white dark:bg-slate-800 p-4 rounded-2xl border flex items-center gap-4">
+                    <div class="font-bold text-slate-800 dark:text-white text-base">ผู้วิเคราะห์: ${data.fullName} (${data.nickname}) | รุ่น: ${data.batch} | ตำแหน่ง: ${data.position}</div>
+                </div>
+                <div class="col-span-1 md:col-span-3 bg-white dark:bg-slate-800 p-4 rounded-2xl border">
+                    <p class="text-xs text-rose-500 font-bold">มุ่งเป้าหลัก (What Fact): ${data.targetFact}</p>
+                    <p class="text-xs text-emerald-500 font-bold mt-1">รากปัญหาหลัก (Root Cause): ${data.targetCause} [หมวดหมู่: ${data.targetCauseCat || 'ไม่ได้ระบุ'}]</p>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-t-4 border-t-rose-500">
+                    <h4 class="font-bold text-rose-500 text-sm">ก. แก้ทันที</h4>
+                    <p class="text-xs mt-2 text-slate-400">Action: ${data.triad.k.action}</p>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-t-4 border-t-blue-500">
+                    <h4 class="font-bold text-blue-500 text-sm">ข. ขุดราก</h4>
+                    <p class="text-xs mt-2 text-slate-400">Action: ${data.triad.kh.action}</p>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-t-4 border-t-emerald-500">
+                    <h4 class="font-bold text-emerald-500 text-sm">ค. คิดระบบ</h4>
+                    <p class="text-xs mt-2 text-slate-400">Action: ${data.triad.c.action}</p>
+                </div>
+            `;
+        };
+
+        const updateUI = () => {
+            document.querySelectorAll('.step-content').forEach((el, idx) => {
+                if(idx === currentStep) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+            document.getElementById('progress-bar').style.width = `${(currentStep / (totalSteps - 1)) * 100}%`;
+            document.getElementById('btn-prev').disabled = currentStep === 0;
+
+            if(currentStep === 2) extractCauses();
+            if(currentStep === 3) extractCauses();
+
+            document.getElementById('display-fact').innerText = document.getElementById('target-fact').value || "ยังไม่ได้ระบุเลือกเป้าหมายหลัก";
+            document.getElementById('display-cause').innerText = document.getElementById('target-cause').value || "ยังไม่ได้ระบุรากปัญหาเป้าหมาย";
+
+            if(currentStep === totalSteps - 1) {
+                document.getElementById('btn-next').classList.add('hidden');
+                document.getElementById('btn-submit').classList.remove('hidden');
+                renderBentoSummary(gatherAllData(), 'summary-bento');
+            } else {
+                document.getElementById('btn-next').classList.remove('hidden');
+                document.getElementById('btn-submit').classList.add('hidden');
+            }
+        };
+
+        document.getElementById('btn-next').addEventListener('click', () => {
+            if(validateStep()) { currentStep++; window.scrollTo({ top:0, behavior:'smooth' }); updateUI(); }
+        });
+        document.getElementById('btn-prev').addEventListener('click', () => {
+            if(currentStep > 0) { currentStep--; window.scrollTo({ top:0, behavior:'smooth' }); updateUI(); }
+        });
+
+        const loadActiveScenario = async () => {
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'turbo_settings', 'active_scenario');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().text) {
+                    document.getElementById('scenario-text').innerHTML = docSnap.data().text;
+                } else {
+                    document.getElementById('scenario-text').innerHTML = defaultScenario;
+                }
+            } catch (e) {
+                console.error("Error loading scenario", e);
+                document.getElementById('scenario-text').innerHTML = defaultScenario;
+            }
+        };
+
+        // Re-engineered Firebase Architecture Core
+        try {
+            let firebaseConfig;
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            } else {
+                firebaseConfig = {
+                    apiKey: "AIzaSyDGIthXJRGUgut4VOcbldJzVZqQAhGAwFk",
+                    authDomain: "turbo-worksheet-app.firebaseapp.com",
+                    projectId: "turbo-worksheet-app",
+                    storageBucket: "turbo-worksheet-app.firebasestorage.app",
+                    messagingSenderId: "1090406737493",
+                    appId: "1:1090406737493:web:558fae35bcc8ad343596dc"
+                };
+            }
+
+            if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                isFirebaseReady = true;
+
+                const initFirebaseAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Auth error:", error);
+                    }
+                };
+
+                initFirebaseAuth();
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) loadActiveScenario();
+                });
+            } else {
+                document.getElementById('scenario-text').innerHTML = defaultScenario;
+            }
+        } catch (error) {
+            console.error("Firebase init failed:", error);
+            document.getElementById('scenario-text').innerHTML = defaultScenario;
+        }
+
+        document.getElementById('btn-submit').addEventListener('click', async () => {
+            const payload = gatherAllData();
+            if(!isFirebaseReady) {
+                showToast("ระบบออฟไลน์: บันทึกข้อมูลจำลองแบบ Local เรียบร้อย", "success");
+                return;
+            }
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'turbo_worksheets'), payload);
+                showToast("ส่งแผนงานปฏิบัติการสมบูรณ์แบบเสร็จสิ้นเรียบร้อยแล้วค่ะ", "success");
+                document.getElementById('submit-status').classList.remove('hidden');
+                document.getElementById('submit-status').innerHTML = `<p class="text-emerald-500 font-bold">บันทึกเรียบร้อย ขอบคุณค่ะคุณ ${payload.fullName}</p>`;
+            } catch(e) {
+                showToast("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูลปลายทาง");
+            }
+        });
+
+        // Theme Toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
+
+        // --- ADMIN SYSTEMS ---
+        window.checkAdminPwd = async () => {
+            if(document.getElementById('admin-pwd').value === 'tictacbird99') {
+                document.getElementById('admin-login-modal').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                await loadAdminDashboard();
+            } else {
+                showToast("รหัสผ่านผู้ดูแลระบบไม่ถูกต้อง");
+            }
+        };
+
+        document.getElementById('btn-secret-admin').addEventListener('click', () => {
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+        });
+
+        const loadAdminDashboard = async () => {
+            if(!isFirebaseReady) return;
+            try {
+                const snapshot = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'turbo_worksheets'));
+                allSubmissions = [];
+                snapshot.forEach(doc => allSubmissions.push({ id: doc.id, ...doc.data() }));
+                allSubmissions.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                buildFiltersAndRenderTable();
+            } catch(e) { console.error(e); }
+        };
+
+        const buildFiltersAndRenderTable = () => {
+            const batchSel = document.getElementById('filter-batch');
+            const posSel = document.getElementById('filter-position');
+            const regSel = document.getElementById('filter-region');
+
+            const batches = new Set(), positions = new Set(), regions = new Set();
+            allSubmissions.forEach(s => {
+                if(s.batch) batches.add(s.batch);
+                if(s.position) positions.add(s.position);
+                if(s.region) regions.add(s.region);
+            });
+
+            if(batchSel) {
+                batchSel.innerHTML = '<option value="">ทุกรุ่นอบรม</option>';
+                batches.forEach(b => batchSel.innerHTML += `<option value="${b}">${b}</option>`);
+            }
+            if(posSel) {
+                posSel.innerHTML = '<option value="">ทุกตำแหน่ง</option>';
+                positions.forEach(p => posSel.innerHTML += `<option value="${p}">${p}</option>`);
+            }
+            if(regSel) {
+                regSel.innerHTML = '<option value="">ทุกภูมิภาค</option>';
+                regions.forEach(r => regSel.innerHTML += `<option value="${r}">${r}</option>`);
+            }
+
+            applyFiltersAndRender();
+        };
+
+        const applyFiltersAndRender = () => {
+            const searchVal = document.getElementById('admin-search').value.toLowerCase();
+            const filterB = document.getElementById('filter-batch').value;
+            const filterP = document.getElementById('filter-position').value;
+            const filterR = document.getElementById('filter-region').value;
+            const filterC = document.getElementById('filter-cat').value;
+
+            const filtered = allSubmissions.filter(s => {
+                const matchesSearch = (s.empId || '').toLowerCase().includes(searchVal) || 
+                                      (s.fullName || '').toLowerCase().includes(searchVal) || 
+                                      (s.targetFact || '').toLowerCase().includes(searchVal);
+                const matchesBatch = !filterB || s.batch === filterB;
+                const matchesPos = !filterP || s.position === filterP;
+                const matchesReg = !filterR || s.region === filterR;
+                const matchesCat = !filterC || s.targetCauseCat === filterC;
+                return matchesSearch && matchesBatch && matchesPos && matchesReg && matchesCat;
+            });
+
+            const tbody = document.getElementById('admin-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = filtered.length ? '' : '<tr><td colspan="8" class="text-center py-6 text-slate-400">ไม่พบผลคำตอบตามที่ค้นหา</td></tr>';
+            
+            filtered.forEach(sub => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 border-b text-slate-700 dark:text-slate-300";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-mono text-[11px]">${new Date(sub.timestamp).toLocaleDateString('th-TH')}</td>
+                    <td class="px-4 py-3 font-bold text-ntb-accent">${sub.empId}</td>
+                    <td class="px-4 py-3 font-semibold">${sub.fullName} (${sub.nickname || '-'})</td>
+                    <td class="px-4 py-3">${sub.batch || '-'}</td>
+                    <td class="px-4 py-3">${sub.position || '-'}</td>
+                    <td class="px-4 py-3 truncate max-w-[150px]">${sub.targetFact || '-'}</td>
+                    <td class="px-4 py-3 font-bold text-emerald-600">${sub.targetCauseCat || '-'}</td>
+                    <td class="px-4 py-3 text-center flex justify-center gap-1">
+                        <button class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-500 text-[11px] font-bold" onclick="viewSlideFull('${sub.id}')">👁 ดูสไลด์เต็ม</button>
+                        <button class="bg-rose-600 text-white px-2 py-1 rounded hover:bg-rose-500 text-[11px]" onclick="deleteSub('${sub.id}')">✖ ลบ</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        document.getElementById('admin-search').addEventListener('input', applyFiltersAndRender);
+        document.getElementById('filter-batch').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('filter-position').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('filter-region').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('filter-cat').addEventListener('change', applyFiltersAndRender);
+
+        window.deleteSub = async (id) => {
+            if(!confirm("⚠️ คุณแน่ใจชัวร์ไหมคะว่าต้องการลบคำตอบข้อมูลผู้เรียนท่านนี้อย่างถาวร?")) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'turbo_worksheets', id));
+                showToast("ลบข้อมูลออกจากเซิร์ฟเวอร์เสร็จสิ้น", "success");
+                await loadAdminDashboard();
+            } catch(e) { showToast("เกิดข้อผิดพลาดในการลบข้อมูลค่ะ"); }
+        };
+
+        window.viewSlideFull = (id) => {
+            const s = allSubmissions.find(sub => sub.id === id);
+            if(!s) return;
+
+            document.getElementById('admin-view-title').innerText = `สไลด์รายงานแผนงาน: ${s.fullName} (${s.nickname || '-'})`;
+            document.getElementById('admin-view-meta').innerText = `รหัสพนักงาน: ${s.empId} | รุ่น: ${s.batch} | ตำแหน่ง: ${s.position} | ภูมิภาค: ${s.region}`;
+
+            const container = document.getElementById('admin-slides-container');
+            container.innerHTML = '';
+
+            const listBuilder = (arr) => arr && arr.length ? arr.map(i => `<li class="mb-1 text-slate-300">• ${i}</li>`).join('') : '<li>- ไม่มีข้อมูล -</li>';
+            const circleBuilder = (arr, status) => arr && arr.length ? arr.filter(c => c.status === status).map(c => `<span class="bg-slate-800 border px-2 py-1 rounded text-[11px] text-white font-medium">${c.text}</span>`).join(' ') : '<span class="text-slate-500 text-xs">- ไม่มีสาเหตุถูกจัดลงกลุ่มนี้ -</span>';
+
+            const p1 = document.createElement('div');
+            p1.className = "print-slide bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between";
+            p1.innerHTML = `
+                <div class="flex justify-between border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="text-white text-lg font-bold"><i class="fa-solid fa-file-invoice mr-2 text-ntb-accent"></i>[หน้า 1/5] ข้อมูลประมวลแยกแยะความจริง (Fact & Opinion) & 4M1E Analysis</h2>
+                    <span class="text-xs font-mono text-slate-400">ผู้นำ: ${s.fullName} #${s.empId}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <h3 class="text-emerald-400 font-bold text-sm mb-2"><i class="fa-solid fa-check-circle mr-1"></i>ข้อเท็จจริง (Facts)</h3>
+                        <ul class="text-xs list-none">${listBuilder(s.facts)}</ul>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <h3 class="text-blue-400 font-bold text-sm mb-2"><i class="fa-solid fa-comment mr-1"></i>ข้อคิดเห็น (Opinions)</h3>
+                        <ul class="text-xs list-none">${listBuilder(s.opinions)}</ul>
+                    </div>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h3 class="text-ntb-accent font-bold text-sm mb-2"><i class="fa-solid fa-microscope mr-1"></i>วิเคราะห์เหตุผล 4M1E</h3>
+                    <div class="grid grid-cols-5 gap-2 text-[11px]">
+                        <div><strong class="text-blue-400">Man (คน):</strong><p class="text-slate-300 mt-1">${(s.causes || []).filter(c=>c.category==='Man (คน)').map(c=>c.text).join(', ') || '-'}</p></div>
+                        <div><strong class="text-purple-400">Machine (อุปกรณ์):</strong><p class="text-slate-300 mt-1">${(s.causes || []).filter(c=>c.category==='Machine (อุปกรณ์)').map(c=>c.text).join(', ') || '-'}</p></div>
+                        <div><strong class="text-amber-400">Material (วัตถุดิบ):</strong><p class="text-slate-300 mt-1">${(s.causes || []).filter(c=>c.category==='Material (วัตถุดิบ)' || c.category==='Material (สื่อ)').map(c=>c.text).join(', ') || '-'}</p></div>
+                        <div><strong class="text-emerald-400">Method (ขั้นตอน):</strong><p class="text-slate-300 mt-1">${(s.causes || []).filter(c=>c.category==='Method (ขั้นตอน)').map(c=>c.text).join(', ') || '-'}</p></div>
+                        <div><strong class="text-rose-400">Environment:</strong><p class="text-slate-300 mt-1">${(s.causes || []).filter(c=>c.category==='Environment (สภาพแวดล้อม)').map(c=>c.text).join(', ') || '-'}</p></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(p1);
+
+            const p2 = document.createElement('div');
+            p2.className = "print-slide bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between";
+            p2.innerHTML = `
+                <div class="flex justify-between border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="text-white text-lg font-bold"><i class="fa-solid fa-bullseye mr-2 text-emerald-500"></i>[หน้า 2/5] ตีกรอบขอบเขตอิทธิพล (Circle of Control Focus)</h2>
+                    <span class="text-xs font-mono text-slate-400">${s.fullName}</span>
+                </div>
+                <div class="space-y-4 flex-grow flex flex-col justify-center">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 border-l-4 border-l-emerald-500">
+                        <h4 class="text-emerald-400 font-bold text-xs mb-2 uppercase tracking-wide"><i class="fa-solid fa-hand-holding-hand mr-1"></i>วงใน (สิ่งที่ควบคุมจัดการได้เอง)</h4>
+                        <div class="flex flex-wrap gap-2">${circleBuilder(s.causes, 'in')}</div>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 border-l-4 border-l-rose-500">
+                        <h4 class="text-rose-400 font-bold text-xs mb-2 uppercase tracking-wide"><i class="fa-solid fa-ban mr-1"></i>วงนอก (สิ่งที่ควบคุมดูแลจัดการไม่ได้)</h4>
+                        <div class="flex flex-wrap gap-2">${circleBuilder(s.causes, 'out')}</div>
+                    </div>
+                </div>
+                <div class="mt-4 bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                    <span class="text-slate-400 text-xs font-bold block uppercase mb-1">รากปัญหาหลักมุ่งเป้าที่เลือกไปแก้ต่อ (Root Cause Target)</span>
+                    <p class="text-white font-bold text-base text-glow">"${s.targetCause}" <span class="text-emerald-400 text-xs ml-2 font-medium">(${s.targetCauseCat || 'ไม่ได้ระบุหมวดหมู่'})</span></p>
+                </div>
+            `;
+            container.appendChild(p2);
+
+            const p3 = document.createElement('div');
+            p3.className = "print-slide bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between";
+            p3.innerHTML = `
+                <div class="flex justify-between border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="text-white text-lg font-bold"><i class="fa-solid fa-rocket mr-2 text-blue-500"></i>[หน้า 3/5] แผนยุทธศาสตร์ยุทธวิธีแก้ปัญหาสามมิติ วิชา "ก-ข-ค"</h2>
+                    <span class="text-xs font-mono text-slate-400">เป้าหมายรากปัญหา: ${s.targetCause}</span>
+                </div>
+                <div class="overflow-x-auto w-full flex-grow flex items-center">
+                    <table class="w-full text-left text-[11px] border border-slate-800 bg-slate-950 rounded-xl overflow-hidden">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-300 font-bold border-b border-slate-800">
+                                <th class="p-3 text-center">ประเภทแผน</th>
+                                <th class="p-3">ลงมือทำ (Action)</th>
+                                <th class="p-3">ผู้ที่เกี่ยวข้อง</th>
+                                <th class="p-3">กำหนดเสร็จ</th>
+                                <th class="p-3">วิธีการวัดผล</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800 text-slate-300">
+                            <tr>
+                                <td class="bg-rose-600/30 font-bold p-3 text-center text-rose-400">ก. แก้ทันที<br><small class="opacity-70 text-[9px]">(Correction)</small></td>
+                                <td class="p-3">${s.triad?.k?.action || '-'}</td>
+                                <td class="p-3">${s.triad?.k?.who || '-'}</td>
+                                <td class="p-3">${s.triad?.k?.when || '-'}</td>
+                                <td class="p-3">${s.triad?.k?.measure || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td class="bg-blue-600/30 font-bold p-3 text-center text-blue-400">ข. ขุดราก<br><small class="opacity-70 text-[9px]">(Corrective)</small></td>
+                                <td class="p-3">${s.triad?.kh?.action || '-'}</td>
+                                <td class="p-3">${s.triad?.kh?.who || '-'}</td>
+                                <td class="p-3">${s.triad?.kh?.when || '-'}</td>
+                                <td class="p-3">${s.triad?.kh?.measure || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td class="bg-emerald-600/30 font-bold p-3 text-center text-emerald-400">ค. คิดระบบ<br><small class="opacity-70 text-[9px]">(Preventive)</small></td>
+                                <td class="p-3">${s.triad?.c?.action || '-'}</td>
+                                <td class="p-3">${s.triad?.c?.who || '-'}</td>
+                                <td class="p-3">${s.triad?.c?.when || '-'}</td>
+                                <td class="p-3">${s.triad?.c?.measure || '-'}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.appendChild(p3);
+
+            const p4 = document.createElement('div');
+            p4.className = "print-slide bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between";
+            p4.innerHTML = `
+                <div class="flex justify-between border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="text-white text-lg font-bold"><i class="fa-solid fa-chart-pie mr-2 text-purple-500"></i>[หน้า 4/5] Executive Bento Summary Board หน้าสรุปแผนปฏิบัติการ</h2>
+                    <span class="text-xs font-mono text-slate-400">#${s.empId}</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 flex-grow" id="p4-bento-hook"></div>
+            `;
+            container.appendChild(p4);
+            renderBentoSummary(s, 'p4-bento-hook');
+
+            const p5 = document.createElement('div');
+            p5.className = "print-slide bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between";
+            p5.innerHTML = `
+                <div class="flex justify-between border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="text-white text-lg font-bold"><i class="fa-solid fa-crown mr-2 text-amber-400"></i>[หน้า 5/5] แผนผังภาพรวมกลยุทธ์การขจัดปัญหาภาพรวมเด็ดขาด (Master Action Plan)</h2>
+                    <span class="text-xs font-bold text-amber-400">TURBO Framework</span>
+                </div>
+                <div class="bg-slate-950 p-5 rounded-2xl border text-center flex-grow flex flex-col justify-center items-center">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">หัวข้อหลักความจริงมุ่งเป้า (What Fact Focus)</div>
+                    <div class="text-white text-lg font-medium max-w-2xl mb-4 border-b border-slate-800 pb-3">"${s.targetFact}"</div>
+                    
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">รากสาเหตุเชิงลึกมิติคุมได้ (Root Cause Category: ${s.targetCauseCat || 'ทั่วไป'})</div>
+                    <div class="text-emerald-400 text-xl font-bold max-w-2xl mb-6">"${s.targetCause}"</div>
+                    
+                    <div class="w-full grid grid-cols-3 gap-3 text-left mt-2">
+                        <div class="p-3 bg-rose-950/40 rounded-xl border border-rose-900/50 text-[11px]"><strong class="text-rose-400">ก. ดับไฟทันที:</strong> <span class="text-slate-300 block mt-1">${s.triad.k.action}</span></div>
+                        <div class="p-3 bg-blue-950/40 rounded-xl border border-blue-900/50 text-[11px]"><strong class="text-blue-400">ข. ขุดรากถอนโคน:</strong> <span class="text-slate-300 block mt-1">${s.triad.kh.action}</span></div>
+                        <div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-900/50 text-[11px]"><strong class="text-emerald-400">ค. วางระบบป้องกัน:</strong> <span class="text-slate-300 block mt-1">${s.triad.c.action}</span></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(p5);
+
+            document.getElementById('admin-view-modal').classList.remove('hidden');
+        };
+
+        initM4E1UI();
+        updateUI();
+    </script>
+</body>
+</html>
+
+```
